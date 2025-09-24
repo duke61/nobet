@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>2025 Çalışma Çizelgesi</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+  th, td { border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 30px; }
+  th { background-color: #f0f0f0; }
+  .E { background-color: #d0f0d0; } /* Evden */
+  .O { background-color: #f0d0d0; } /* Ofisten */
+  .N { background-color: #f0f0d0; } /* Nöbet */
+  .D { background-color: #d0d0f0; } /* Deploy */
+</style>
+</head>
+<body>
+
+<h2>2025 Yılı Çalışma Çizelgesi</h2>
+
+<label for="viewSelect">Görünüm: </label>
+<select id="viewSelect" onchange="changeView()">
+  <option value="weekly">Haftalık</option>
+  <option value="monthly" selected>Aylık</option>
+  <option value="yearly">Yıllık</option>
+</select>
+
+<div id="calendar"></div>
+
+<script>
+const personel = ["Akif","Burak","M. Görü","M.E.Polat","İbrahim","O.Y.Arslan","Tuğba","Nursema","Serkan"];
+const months = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+const daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
+
+// Rastgele seçim
+function randomChoice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Aylık veri oluşturma
+function generateMonthData(monthIndex) {
+  const days = daysInMonth[monthIndex];
+  let table = `<table><tr><th>Personel</th>`;
+  for(let d=1; d<=days; d++) table += `<th>${d}</th>`;
+  table += `</tr>`;
+
+  for(let p=0; p<personel.length; p++) {
+    table += `<tr><td>${personel[p]}</td>`;
+    let officeDays = 0;
+    for(let d=1; d<=days; d++) {
+      let status;
+      if((d + p) % 5 === 0) {
+        status = "N"; 
+      } else {
+        if(officeDays / d < 0.5) { status = "O"; officeDays++; }
+        else status = "E";
+      }
+      table += `<td class="${status}" contenteditable="true">${status}</td>`;
+    }
+    table += `</tr>`;
+  }
+  table += `</table>`;
+  return table;
+}
+
+// Haftalık görünüm
+function generateWeekData(weekNum) {
+  let table = `<table><tr><th>Personel</th>`;
+  for(let d=1; d<=7; d++) table += `<th>G${d}</th>`;
+  table += `</tr>`;
+  
+  for(let p=0; p<personel.length; p++) {
+    table += `<tr><td>${personel[p]}</td>`;
+    for(let d=1; d<=7; d++) {
+      let status = ((d + weekNum + p) % 5 === 0) ? "N" : (Math.random() < 0.5 ? "O" : "E");
+      table += `<td class="${status}" contenteditable="true">${status}</td>`;
+    }
+    table += `</tr>`;
+  }
+  table += `</table>`;
+  return table;
+}
+
+// Yıllık görünüm
+function generateYearData() {
+  let html = "";
+  for(let m=0; m<12; m++) html += `<h3>${months[m]}</h3>` + generateMonthData(m);
+  return html;
+}
+
+// Görünüm değiştirme
+function changeView() {
+  const view = document.getElementById("viewSelect").value;
+  if(view === "monthly") document.getElementById("calendar").innerHTML = generateMonthData(0);
+  else if(view === "weekly") document.getElementById("calendar").innerHTML = generateWeekData(1);
+  else if(view === "yearly") document.getElementById("calendar").innerHTML = generateYearData();
+}
+
+// Başlangıç: Ocak ayı
+document.getElementById("calendar").innerHTML = generateMonthData(0);
+</script>
+
+</body>
+</html>
