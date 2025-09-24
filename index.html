@@ -1,106 +1,71 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<title>2025 Çalışma Çizelgesi</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Çalışma Çizelgesi</title>
+
+<!-- Google Fonts & Font Awesome -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/a2e0e6ad5d.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-  body { font-family: Arial, sans-serif; padding: 20px; }
-  table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-  th, td { border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 30px; }
-  th { background-color: #f0f0f0; }
-  .E { background-color: #d0f0d0; } /* Evden */
-  .O { background-color: #f0d0d0; } /* Ofisten */
-  .N { background-color: #f0f0d0; } /* Nöbet */
-  .D { background-color: #d0d0f0; } /* Deploy */
-</style>
-</head>
-<body>
-
-<h2>2025 Yılı Çalışma Çizelgesi</h2>
-
-<label for="viewSelect">Görünüm: </label>
-<select id="viewSelect" onchange="changeView()">
-  <option value="weekly">Haftalık</option>
-  <option value="monthly" selected>Aylık</option>
-  <option value="yearly">Yıllık</option>
-</select>
-
-<div id="calendar"></div>
-
-<script>
-const personel = ["Akif","Burak","M. Görü","M.E.Polat","İbrahim","O.Y.Arslan","Tuğba","Nursema","Serkan"];
-const months = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
-const daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
-
-// Rastgele seçim
-function randomChoice(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+:root {
+  --primary: #4a90e2;
+  --secondary: #f5f7fa;
+  --accent: #ff7f50;
+  --text: #333;
+  --bg: #fff;
+  --card-bg: #fff;
+  --shadow: rgba(0,0,0,0.1);
 }
 
-// Aylık veri oluşturma
-function generateMonthData(monthIndex) {
-  const days = daysInMonth[monthIndex];
-  let table = `<table><tr><th>Personel</th>`;
-  for(let d=1; d<=days; d++) table += `<th>${d}</th>`;
-  table += `</tr>`;
-
-  for(let p=0; p<personel.length; p++) {
-    table += `<tr><td>${personel[p]}</td>`;
-    let officeDays = 0;
-    for(let d=1; d<=days; d++) {
-      let status;
-      if((d + p) % 5 === 0) {
-        status = "N"; 
-      } else {
-        if(officeDays / d < 0.5) { status = "O"; officeDays++; }
-        else status = "E";
-      }
-      table += `<td class="${status}" contenteditable="true">${status}</td>`;
-    }
-    table += `</tr>`;
-  }
-  table += `</table>`;
-  return table;
+body.dark {
+  --primary: #4a90e2;
+  --secondary: #1c1c1c;
+  --accent: #ff7f50;
+  --text: #f0f0f0;
+  --bg: #121212;
+  --card-bg: #1e1e1e;
+  --shadow: rgba(0,0,0,0.6);
 }
 
-// Haftalık görünüm
-function generateWeekData(weekNum) {
-  let table = `<table><tr><th>Personel</th>`;
-  for(let d=1; d<=7; d++) table += `<th>G${d}</th>`;
-  table += `</tr>`;
-  
-  for(let p=0; p<personel.length; p++) {
-    table += `<tr><td>${personel[p]}</td>`;
-    for(let d=1; d<=7; d++) {
-      let status = ((d + weekNum + p) % 5 === 0) ? "N" : (Math.random() < 0.5 ? "O" : "E");
-      table += `<td class="${status}" contenteditable="true">${status}</td>`;
-    }
-    table += `</tr>`;
-  }
-  table += `</table>`;
-  return table;
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--secondary);
+  color: var(--text);
+  line-height: 1.6;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-// Yıllık görünüm
-function generateYearData() {
-  let html = "";
-  for(let m=0; m<12; m++) html += `<h3>${months[m]}</h3>` + generateMonthData(m);
-  return html;
+header {
+  background: var(--primary);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 5px var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
 }
 
-// Görünüm değiştirme
-function changeView() {
-  const view = document.getElementById("viewSelect").value;
-  if(view === "monthly") document.getElementById("calendar").innerHTML = generateMonthData(0);
-  else if(view === "weekly") document.getElementById("calendar").innerHTML = generateWeekData(1);
-  else if(view === "yearly") document.getElementById("calendar").innerHTML = generateYearData();
-}
+header h1 { margin: 0; font-size: 1.8rem; }
 
-// Başlangıç: Ocak ayı
-document.getElementById("calendar").innerHTML = generateMonthData(0);
-</script>
-
-</body>
-</html>
-
-
+header .logout-btn {
+  position: absolute;
+  right: 3.5rem;
+  top: 1rem;
+  background: #fff;
+  color: var(--primary);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
